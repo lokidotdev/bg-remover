@@ -56,8 +56,14 @@ export const Route = createRootRoute({
     links: [
       { rel: 'stylesheet', href: appCss },
       { rel: 'canonical', href: 'https://openbg.vercel.app/' },
+      { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' },
     ],
     scripts: [
+      {
+        src: 'https://silentpulse.vercel.app/script.js',
+        defer: true,
+        'data-website-id': '5d7ab2b6-2101-49a9-a143-e33d31e6187f',
+      },
       {
         type: 'application/ld+json',
         children: JSON.stringify({
