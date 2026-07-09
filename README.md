@@ -1,7 +1,7 @@
-# Background Remover
+# OpenBG
 
-A minimal, single-page web app to remove image backgrounds — entirely in the
-browser. No servers, no uploads: your images never leave your device.
+A free, open source, single-page web app to remove image backgrounds — entirely
+in the browser. No servers, no uploads: your images never leave your device.
 
 Built with [TanStack Start](https://tanstack.com/start), React, Tailwind CSS,
 and [`@imgly/background-removal`](https://github.com/imgly/background-removal-js)

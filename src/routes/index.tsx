@@ -152,11 +152,12 @@ function Home() {
       <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-5 py-10 sm:py-16">
         <header className="mb-10 text-center">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Background Remover
+            OpenBG
           </h1>
           <p className="mx-auto mt-3 max-w-md text-sm text-neutral-500">
-            Upload an image and remove its background — right in your browser.
-            Nothing is ever uploaded to a server.
+            A free, open source background remover that runs completely in your
+            browser. Upload an image and remove its background — nothing is ever
+            uploaded to a server.
           </p>
         </header>
 
@@ -305,7 +306,7 @@ function Home() {
         </div>
 
         <footer className="mt-12 text-center text-xs text-neutral-400">
-          Runs fully in your browser · Built with TanStack Start
+          OpenBG · Free & open source · Runs fully in your browser
         </footer>
       </div>
     </main>
