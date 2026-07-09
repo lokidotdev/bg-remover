@@ -1,11 +1,43 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select'
 
 export const Route = createFileRoute('/')({
   component: Home,
 })
 
 type Status = 'idle' | 'ready' | 'processing' | 'done' | 'error'
+
+// @imgly ships three model sizes. Labels are written for non-technical users.
+type ModelId = 'isnet' | 'isnet_fp16' | 'isnet_quint8'
+
+const MODELS: {
+  id: ModelId
+  label: string
+  hint: string
+}[] = [
+  {
+    id: 'isnet_quint8',
+    label: 'Fast',
+    hint: 'Smallest download, quickest — great for everyday photos',
+  },
+  {
+    id: 'isnet_fp16',
+    label: 'Balanced',
+    hint: 'A good mix of speed and quality',
+  },
+  {
+    id: 'isnet',
+    label: 'Best quality',
+    hint: 'Sharpest edges — larger download, slower',
+  },
+]
 
 function Home() {
   const [status, setStatus] = useState<Status>('idle')
@@ -15,7 +47,27 @@ function Home() {
   const [progress, setProgress] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [dragOver, setDragOver] = useState(false)
+  const [model, setModel] = useState<ModelId>('isnet_fp16')
+  const [showToast, setShowToast] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Show a one-time notice explaining the first run is slower.
+  useEffect(() => {
+    try {
+      if (!localStorage.getItem('bgr-seen-notice')) {
+        setShowToast(true)
+        localStorage.setItem('bgr-seen-notice', '1')
+      }
+    } catch {
+      setShowToast(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!showToast) return
+    const t = setTimeout(() => setShowToast(false), 8000)
+    return () => clearTimeout(t)
+  }, [showToast])
 
   const reset = useCallback(() => {
     setStatus('idle')
@@ -48,12 +100,13 @@ function Home() {
     try {
       const { removeBackground } = await import('@imgly/background-removal')
       const blob = await removeBackground(originalUrl, {
+        model,
         progress: (key, current, total) => {
           const pct = total ? Math.round((current / total) * 100) : 0
           setProgress(
             key.startsWith('fetch')
               ? `Downloading model… ${pct}%`
-              : `Processing… ${pct}%`,
+              : `Removing background… ${pct}%`,
           )
         },
       })
@@ -64,7 +117,7 @@ function Home() {
       setError('Something went wrong while removing the background.')
       setStatus('error')
     }
-  }, [originalUrl])
+  }, [originalUrl, model])
 
   const downloadName = fileName
     ? fileName.replace(/\.[^.]+$/, '') + '-no-bg.png'
@@ -74,6 +127,28 @@ function Home() {
 
   return (
     <main className="min-h-screen w-full bg-white text-black">
+      {/* First-load toast */}
+      {showToast && (
+        <div className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+          <div className="pointer-events-auto flex max-w-md items-start gap-3 rounded-xl border border-neutral-200 bg-black px-4 py-3 text-sm text-white shadow-lg">
+            <span aria-hidden className="mt-0.5">
+              ⏳
+            </span>
+            <p className="flex-1 leading-snug">
+              The first background removal downloads a small AI model, so it may
+              take a little longer. Every run after that is fast.
+            </p>
+            <button
+              onClick={() => setShowToast(false)}
+              className="text-neutral-400 transition-colors hover:text-white"
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-5 py-10 sm:py-16">
         <header className="mb-10 text-center">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -170,8 +245,34 @@ function Home() {
           )}
         </div>
 
+        {/* Model picker */}
+        <div className="mx-auto mt-8 w-full max-w-xs">
+          <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-neutral-500">
+            Quality
+          </label>
+          <Select
+            value={model}
+            onValueChange={(v) => setModel(v as ModelId)}
+            disabled={busy}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {MODELS.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  <span className="flex flex-col text-left">
+                    <span className="font-medium">{m.label}</span>
+                    <span className="text-xs text-neutral-500">{m.hint}</span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Actions */}
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           {originalUrl && status !== 'done' && (
             <button
               onClick={removeBackground}
