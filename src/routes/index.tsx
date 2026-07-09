@@ -47,7 +47,7 @@ function Home() {
   const [progress, setProgress] = useState<string>('')
   const [error, setError] = useState<string>('')
   const [dragOver, setDragOver] = useState(false)
-  const [model, setModel] = useState<ModelId>('isnet_fp16')
+  const [model, setModel] = useState<ModelId>('isnet_quint8')
   const [showToast, setShowToast] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -260,11 +260,8 @@ function Home() {
             </SelectTrigger>
             <SelectContent>
               {MODELS.map((m) => (
-                <SelectItem key={m.id} value={m.id}>
-                  <span className="flex flex-col text-left">
-                    <span className="font-medium">{m.label}</span>
-                    <span className="text-xs text-neutral-500">{m.hint}</span>
-                  </span>
+                <SelectItem key={m.id} value={m.id} description={m.hint}>
+                  <span className="font-medium">{m.label}</span>
                 </SelectItem>
               ))}
             </SelectContent>
