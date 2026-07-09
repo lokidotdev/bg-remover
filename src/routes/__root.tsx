@@ -41,6 +41,10 @@ export const Route = createRootRoute({
         content:
           'Remove image backgrounds instantly, right in your browser. Free, open source, and completely private — your photos never leave your device.',
       },
+      {
+        property: 'og:image',
+        content: 'https://openbg.vercel.app/images/ogimage.webp',
+      },
       // Twitter
       { name: 'twitter:card', content: 'summary_large_image' },
       {
@@ -51,6 +55,10 @@ export const Route = createRootRoute({
         name: 'twitter:description',
         content:
           'Remove image backgrounds instantly, right in your browser. Free, open source, and completely private.',
+      },
+      {
+        name: 'twitter:image',
+        content: 'https://openbg.vercel.app/images/ogimage.webp',
       },
     ],
     links: [

@@ -158,7 +158,7 @@ function Home() {
         <header className="mb-10">
           <div className="mb-6 flex items-center justify-between">
             <a href="/" className="flex items-center gap-2">
-              <img src="/logo.svg" alt="OpenBG logo" className="h-8 w-8" />
+              <img src="https://res.cloudinary.com/dpcy2txus/image/upload/v1783636325/Screenshot_2026-07-10_033805-no-bg_1_lec8lu.png" alt="OpenBG logo" className="h-8 w-8" />
               <span className="text-lg font-semibold tracking-tight">
                 OpenBG
               </span>
