@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Select,
@@ -194,87 +195,126 @@ function Home() {
 
         {/* Upload / preview area */}
         <div className="flex-1">
-          {!originalUrl ? (
-            <label
-              onDragOver={(e) => {
-                e.preventDefault()
-                setDragOver(true)
-              }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => {
-                e.preventDefault()
-                setDragOver(false)
-                loadFile(e.dataTransfer.files?.[0])
-              }}
-              className={`flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed transition-colors ${
-                dragOver
-                  ? 'border-black bg-neutral-50'
-                  : 'border-neutral-300 hover:border-black hover:bg-neutral-50'
-              }`}
-            >
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={(e) => loadFile(e.target.files?.[0])}
-              />
-              <svg
-                className="mb-4 h-8 w-8 text-neutral-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 16.5V9m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-                />
-              </svg>
-              <span className="text-sm font-medium">Click to upload</span>
-              <span className="mt-1 text-xs text-neutral-500">
-                or drag and drop — PNG, JPG, WEBP
-              </span>
-            </label>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <figure className="space-y-2">
-                <figcaption className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-                  Original
-                </figcaption>
-                <div className="checkerboard flex aspect-square items-center justify-center overflow-hidden rounded-2xl border border-neutral-200">
-                  <img
-                    src={originalUrl}
-                    alt="Original"
-                    className="max-h-full max-w-full object-contain"
+          <motion.div
+            layout
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className={`relative mx-auto w-full overflow-hidden rounded-2xl ${
+              originalUrl
+                ? 'checkerboard aspect-square max-w-md border border-neutral-200'
+                : 'aspect-video border border-dashed border-neutral-300'
+            }`}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {!originalUrl ? (
+                <motion.label
+                  key="dropzone"
+                  initial={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    setDragOver(true)
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    setDragOver(false)
+                    loadFile(e.dataTransfer.files?.[0])
+                  }}
+                  className={`flex h-full w-full cursor-pointer flex-col items-center justify-center transition-colors ${
+                    dragOver
+                      ? 'bg-neutral-50'
+                      : 'hover:border-black hover:bg-neutral-50'
+                  }`}
+                >
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(e) => loadFile(e.target.files?.[0])}
                   />
-                </div>
-              </figure>
-              <figure className="space-y-2">
-                <figcaption className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-                  Result
-                </figcaption>
-                <div className="checkerboard flex aspect-square items-center justify-center overflow-hidden rounded-2xl border border-neutral-200">
-                  {hasCurrentResult ? (
-                    <img
-                      src={resultUrl!}
-                      alt="Background removed"
-                      className="max-h-full max-w-full object-contain"
+                  <svg
+                    className="mb-4 h-8 w-8 text-neutral-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 16.5V9m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
                     />
-                  ) : (
-                    <span className="px-4 text-center text-xs text-neutral-500">
-                      {busy
-                        ? progress || 'Working…'
-                        : resultUrl
-                          ? 'Run again for this quality'
-                          : 'Not processed yet'}
-                    </span>
-                  )}
-                </div>
-              </figure>
-            </div>
-          )}
+                  </svg>
+                  <span className="text-sm font-medium">Click to upload</span>
+                  <span className="mt-1 text-xs text-neutral-500">
+                    or drag and drop — PNG, JPG, WEBP
+                  </span>
+                </motion.label>
+              ) : (
+                <motion.div
+                  key="preview"
+                  initial={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  className="relative flex h-full w-full items-center justify-center"
+                >
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {hasCurrentResult ? (
+                      <motion.img
+                        key="result"
+                        src={resultUrl!}
+                        alt="Background removed"
+                        initial={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
+                        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    ) : (
+                      <motion.img
+                        key="original"
+                        src={originalUrl}
+                        alt="Original"
+                        initial={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
+                        animate={{
+                          opacity: 1,
+                          scale: 1,
+                          filter: busy ? 'blur(2px)' : 'blur(0px)',
+                        }}
+                        exit={{ opacity: 0, scale: 0.97, filter: 'blur(6px)' }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
+                    {busy && (
+                      <motion.div
+                        key="overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-sm"
+                      >
+                        <div className="flex flex-col items-center gap-3 rounded-xl bg-black/80 px-5 py-4 text-white shadow-lg">
+                          <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <span className="text-xs font-medium">
+                            {progress || 'Working…'}
+                          </span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {error && (
             <p className="mt-4 text-center text-sm text-red-600">{error}</p>
